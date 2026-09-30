@@ -32,8 +32,13 @@
                 <p id="lblFechaHoy" class="text-[11px] text-rose-500 font-bold">Cargando fecha...</p>
             </div>
         </div>
-        <div class="bg-rose-50 text-rose-600 font-black text-xs px-3 py-1.5 rounded-xl border border-rose-100 flex items-center gap-1">
-            <span id="cantPendientes">0</span> pendientes
+        <div class="flex items-center gap-2">
+            <button id="btnNotif" onclick="solicitarPermisoNotificaciones()" class="bg-slate-100 text-slate-600 font-bold text-xs p-2 rounded-xl border border-slate-200 flex items-center gap-1" title="Activar Notificaciones">
+                <i class="fa-solid fa-bell text-rose-500"></i>
+            </button>
+            <div class="bg-rose-50 text-rose-600 font-black text-xs px-3 py-1.5 rounded-xl border border-rose-100 flex items-center gap-1">
+                <span id="cantPendientes">0</span> pendientes
+            </div>
         </div>
     </header>
 
@@ -122,16 +127,69 @@
 
     <script>
         let trabajos = JSON.parse(localStorage.getItem('agenda_modista_v10')) || [];
+        let notificadosList = JSON.parse(localStorage.getItem('agenda_notificados_5dias')) || [];
         let rec = null;
         let filtroBarrioActual = 'TODOS';
+        let swRegistration = null;
 
         const hoyObj = new Date();
         const fechaHoyISO = hoyObj.toISOString().split('T')[0];
         document.getElementById('lblFechaHoy').innerText = `Hoy: ${formatearFechaLarga(fechaHoyISO)}`;
 
         const fDefecto = new Date();
-        fDefecto.setDate(fDefecto.getDate() + 3);
+        fDefecto.setDate(fDefecto.getDate() + 5);
         document.getElementById('inputFecha').value = fDefecto.toISOString().split('T')[0];
+
+        // REGISTRO DE SERVICE WORKER PARA NOTIFICACIONES
+        if ('serviceWorker' in navigator && 'Notification' in window) {
+            navigator.serviceWorker.register('sw.js')
+                .then(reg => {
+                    swRegistration = reg;
+                    comprobarNotificaciones5Dias();
+                })
+                .catch(err => console.log('Service Worker no disponible:', err));
+        }
+
+        function solicitarPermisoNotificaciones() {
+            if (!('Notification' in window)) {
+                alert('Tu navegador no soporta notificaciones.');
+                return;
+            }
+            Notification.requestPermission().then(permission => {
+                if (permission === 'granted') {
+                    alert('¡Notificaciones activadas con éxito!');
+                    comprobarNotificaciones5Dias();
+                } else {
+                    alert('No se pudieron activar las notificaciones.');
+                }
+            });
+        }
+
+        function comprobarNotificaciones5Dias() {
+            if (Notification.permission !== 'granted' || !swRegistration) return;
+
+            trabajos.forEach(t => {
+                if (t.completado || !t.fechaEntrega) return;
+
+                const fEntrega = new Date(t.fechaEntrega + 'T00:00:00');
+                const fHoy = new Date(fechaHoyISO + 'T00:00:00');
+                const difDias = Math.ceil((fEntrega - fHoy) / (1000 * 60 * 60 * 24));
+
+                const claveNotif = `${t.id}_5dias_${t.fechaEntrega}`;
+                if (difDias === 5 && !notificadosList.includes(claveNotif)) {
+                    const mensaje = `Recordá que en 5 días tenés que entregar el trabajo de ${t.cliente}.`;
+
+                    if (navigator.serviceWorker.controller) {
+                        navigator.serviceWorker.controller.postMessage({
+                            type: 'NOTIFICAR_ENTREGA',
+                            mensaje: mensaje
+                        });
+                        notificadosList.push(claveNotif);
+                        localStorage.setItem('agenda_notificados_5dias', JSON.stringify(notificadosList));
+                    }
+                }
+            });
+        }
 
         function dictarEnCampo(idCampo, btn) {
             if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
@@ -201,6 +259,7 @@
             trabajos.push(nuevo);
             guardarLocal();
             renderTrabajos();
+            comprobarNotificaciones5Dias();
             
             document.getElementById('inputCliente').value = '';
             document.getElementById('inputBarrio').value = '';
@@ -218,6 +277,7 @@
             if (difDias < 0) return { texto: '🚨 RETRASADO', clase: 'bg-rose-600 text-white animate-pulse', dias: difDias };
             if (difDias <= 1) return { texto: '🔴 URGENTE', clase: 'bg-rose-500 text-white font-black', dias: difDias };
             if (difDias <= 3) return { texto: `🟠 PRÓXIMO (${difDias} días)`, clase: 'bg-amber-500 text-white font-bold', dias: difDias };
+            if (difDias === 5) return { texto: `🔔 EN 5 DÍAS`, clase: 'bg-rose-100 text-rose-700 font-extrabold border border-rose-200', dias: difDias };
             return { texto: `🟢 A TIEMPO (${difDias} días)`, clase: 'bg-emerald-500 text-white font-bold', dias: difDias };
         }
 
@@ -258,17 +318,14 @@
                 return;
             }
 
-            // Obtener lista única de barrios
             const barriosSet = new Set(trabajos.map(t => t.barrio || 'Sin Zona / Taller'));
             const barriosArray = Array.from(barriosSet);
             renderFiltros(barriosArray);
 
-            // Filtrar si hay una zona seleccionada
             const listaFiltrada = filtroBarrioActual === 'TODOS' 
                 ? trabajos 
                 : trabajos.filter(t => (t.barrio || 'Sin Zona / Taller') === filtroBarrioActual);
 
-            // Agrupar por Barrio
             const grupos = {};
             listaFiltrada.forEach(t => {
                 const zona = t.barrio || 'Sin Zona / Taller';
@@ -276,12 +333,10 @@
                 grupos[zona].push(t);
             });
 
-            // Renderizar cada Grupo de Barrio
             Object.keys(grupos).forEach(zona => {
                 const sec = document.createElement('section');
                 sec.className = "space-y-3";
 
-                // Header de la Zona
                 sec.innerHTML = `
                     <div class="flex items-center gap-2 px-1 border-b border-slate-200 pb-1.5">
                         <i class="fa-solid fa-location-dot text-rose-500 text-sm"></i>
@@ -293,7 +348,6 @@
                 const contenedorTarjetas = document.createElement('div');
                 contenedorTarjetas.className = "space-y-3";
 
-                // Ordenar por urgencia dentro del grupo
                 const ordenados = grupos[zona].sort((a, b) => {
                     if (a.completado !== b.completado) return a.completado ? 1 : -1;
                     return obtenerCartelUrgencia(a.fechaEntrega).dias - obtenerCartelUrgencia(b.fechaEntrega).dias;
@@ -317,7 +371,6 @@
                             </div>
                         </div>
 
-                        <!-- TAREAS DESGLOSADAS CON ÍTEMS -->
                         <div class="text-xs sm:text-sm text-slate-800 font-bold bg-slate-50 p-3.5 rounded-2xl border border-slate-100 leading-relaxed whitespace-pre-line ${t.completado ? 'line-through text-slate-400' : ''}">${t.detalle}</div>
 
                         <div class="flex flex-wrap justify-between items-center gap-2 pt-1 text-xs">
