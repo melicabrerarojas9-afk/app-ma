@@ -29,8 +29,8 @@
                 <p id="lblFechaHoy" class="text-[11px] text-rose-500 font-bold">Cargando fecha...</p>
             </div>
         </div>
-        <button onclick="configurarAPIKey()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs px-3 py-2 rounded-xl font-bold flex items-center gap-1.5 border border-slate-200">
-            <i class="fa-solid fa-key text-rose-500"></i> Clave IA
+        <button id="btnApiKey" onclick="configurarAPIKey()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs px-3 py-2 rounded-xl font-bold flex items-center gap-1.5 border border-slate-200">
+            <i class="fa-solid fa-key text-rose-500"></i> <span id="txtBtnKey">Cargar Clave</span>
         </button>
     </header>
 
@@ -39,8 +39,8 @@
         <section class="bg-gradient-to-b from-white to-slate-50 rounded-3xl p-5 shadow-sm border border-slate-200/80 text-center relative overflow-hidden">
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-rose-400 to-pink-500 rounded-b-full"></div>
             
-            <p class="text-[10px] font-extrabold uppercase tracking-wider text-rose-500 mb-1">Dictado con Inteligencia Artificial</p>
-            <h2 class="text-base font-bold text-slate-800 mb-3">Hablá naturalmente</h2>
+            <p class="text-[10px] font-extrabold uppercase tracking-wider text-rose-500 mb-1">Dictado por Voz</p>
+            <h2 class="text-base font-bold text-slate-800 mb-3">Tocá y dictá todo de corrido</h2>
 
             <div class="relative w-20 h-20 mx-auto mb-3 flex items-center justify-center">
                 <button id="btnMic" onclick="toggleDictado()" class="w-16 h-16 bg-gradient-to-tr from-rose-500 to-pink-500 text-white rounded-full flex items-center justify-center text-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-90 z-10">
@@ -49,22 +49,22 @@
             </div>
 
             <div id="statusDictado" class="text-xs font-bold text-slate-500">Tocá para hablar</div>
-            <div id="loaderIA" class="hidden text-xs font-bold text-rose-600 animate-pulse mt-2"><i class="fa-solid fa-spinner fa-spin"></i> Analizando con IA...</div>
+            <div id="loaderIA" class="hidden text-xs font-bold text-rose-600 animate-pulse mt-2"><i class="fa-solid fa-spinner fa-spin"></i> La IA está organizando el pedido...</div>
         </section>
 
         <section id="secFormulario" class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-3">
             <div class="flex items-center justify-between border-b border-slate-100 pb-2">
                 <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                     <i class="fa-solid fa-list-check text-rose-500"></i>
-                    <span>Datos Extraídos</span>
+                    <span>Pedido Detectado</span>
                 </h3>
-                <span class="text-[10px] font-extrabold uppercase bg-rose-50 text-rose-600 px-2.5 py-1 rounded-full">Procesado con IA</span>
+                <span id="badgeEstadoIA" class="text-[10px] font-extrabold uppercase bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">Sin procesar</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
                 <div>
                     <label class="text-[11px] font-semibold text-slate-400 block mb-1">Clienta</label>
-                    <input type="text" id="inputCliente" placeholder="Ej: Agustina" class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 border border-slate-200/80 outline-none">
+                    <input type="text" id="inputCliente" placeholder="Nombre de la clienta" class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 border border-slate-200/80 outline-none">
                 </div>
                 <div>
                     <label class="text-[11px] font-semibold text-slate-400 block mb-1">Zona / Barrio</label>
@@ -73,8 +73,8 @@
             </div>
 
             <div>
-                <label class="text-[11px] font-semibold text-slate-400 block mb-1">Lista de Tareas Exactas</label>
-                <textarea id="inputTareas" rows="4" placeholder="Lista detallada de prendas..." class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200/80 outline-none leading-relaxed"></textarea>
+                <label class="text-[11px] font-semibold text-slate-400 block mb-1">Prendas y Trabajos a realizar</label>
+                <textarea id="inputTareas" rows="4" placeholder="Lista de prendas..." class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200/80 outline-none leading-relaxed"></textarea>
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
@@ -109,7 +109,7 @@
     </main>
 
     <script>
-        let trabajos = JSON.parse(localStorage.getItem('agenda_modista_ia')) || [];
+        let trabajos = JSON.parse(localStorage.getItem('agenda_modista_v3')) || [];
         let apiKey = localStorage.getItem('gemini_api_key') || "";
         let rec = null;
         let escuchando = false;
@@ -118,6 +118,15 @@
         const fechaHoyISO = hoyObj.toISOString().split('T')[0];
         document.getElementById('lblFechaHoy').innerText = `Hoy: ${formatearFechaLarga(fechaHoyISO)}`;
         document.getElementById('inputFechaRetiro').value = fechaHoyISO;
+
+        actualizarEstadoBotonKey();
+
+        function actualizarEstadoBotonKey() {
+            if (apiKey) {
+                document.getElementById('txtBtnKey').innerText = "IA Activa ✓";
+                document.getElementById('btnApiKey').className = "bg-emerald-50 text-emerald-700 text-xs px-3 py-2 rounded-xl font-bold flex items-center gap-1.5 border border-emerald-200";
+            }
+        }
 
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -129,7 +138,7 @@
                 escuchando = true;
                 document.getElementById('btnMic').classList.add('pulse-mic');
                 document.getElementById('micIcon').className = 'fa-solid fa-square';
-                document.getElementById('statusDictado').innerText = 'Escuchando... Dictá con tus palabras.';
+                document.getElementById('statusDictado').innerText = 'Escuchando... Hablá tranquila.';
             };
 
             rec.onend = () => {
@@ -158,19 +167,21 @@
 
             if (apiKey) {
                 try {
-                    const prompt = `Analizá el siguiente audio dictado por una modista y extraé los datos en formato JSON puro (sin etiquetas de codigo ni markdown).
+                    const prompt = `Sos el asistente de un taller de costura. Analizá el siguiente audio dictado por la modista y extraé los datos en formato JSON estricto.
+
 Texto dictado: "${textoOriginal}"
 
-Año actual: ${hoyObj.getFullYear()}.
-Campos a devolver en JSON:
+Fecha de hoy: ${fechaHoyISO} (${hoyObj.getFullYear()}).
+
+Respondé ÚNICAMENTE con un objeto JSON con este formato (sin bloques markdown ni explicaciones):
 {
-  "clienta": "Nombre de la clienta (omitir palabras como retirar, Sra, etc)",
-  "barrio": "Barrio o zona completa (ej: San Isidro Chico, Nordelta)",
-  "tareas": ["Lista bien desglosada y detallada de cada prenda y su arreglo específico"],
-  "fechaEntrega": "Fecha en formato YYYY-MM-DD (Si dice '10 de octubre', es ${hoyObj.getFullYear()}-10-10)"
+  "clienta": "Nombre de la clienta (omitir palabras como 'retiro', 'señora', 'de la casa')",
+  "barrio": "Barrio o ubicación mencionada (ej: San Isidro Chico)",
+  "tareas": ["Lista detallada de cada prenda con su arreglo (ej: 'Agrandar vestido al largo', '3 pantalones sastreros (hacer ruedo)', '1 cartera (arreglar y cambiar cierre)')"],
+  "fechaEntrega": "Fecha en formato YYYY-MM-DD. Si dice 'mañana' es el día posterior a hoy (${fechaHoyISO}). Si dice un día específico calcúlalo respecto a hoy."
 }`;
 
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
@@ -183,57 +194,48 @@ Campos a devolver en JSON:
                     rawText = rawText.replace(/```json|```/g, '').trim();
                     const jsonRes = JSON.parse(rawText);
 
-                    document.getElementById('inputCliente').value = jsonRes.clienta || "Clienta";
+                    document.getElementById('inputCliente').value = jsonRes.clienta || "";
                     document.getElementById('inputUbicacion').value = jsonRes.barrio || "";
                     document.getElementById('inputTareas').value = jsonRes.tareas ? jsonRes.tareas.map(t => `• ${t}`).join('\n') : textoOriginal;
                     document.getElementById('inputFecha').value = jsonRes.fechaEntrega || "";
 
+                    document.getElementById('badgeEstadoIA').innerText = "Procesado con IA ✓";
+                    document.getElementById('badgeEstadoIA').className = "text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full";
                     document.getElementById('loaderIA').classList.add('hidden');
                     return;
                 } catch (err) {
-                    console.error("Error API Gemini:", err);
+                    console.error("Error al consultar la IA:", err);
+                    alert("Hubo un detalle al conectar con la IA. Asegurate de que la clave cargada sea válida.");
                 }
             }
 
-            // Parser alternativo mejorado por patrones si no hay API Key cargada
-            parserLocalAvanzado(textoOriginal);
+            // Si no hay API Key o falla, se cargan los datos crudos reales (NUNCA DATOS FALSOS)
+            document.getElementById('inputCliente').value = "";
+            document.getElementById('inputUbicacion').value = "";
+            document.getElementById('inputTareas').value = textoOriginal;
+            document.getElementById('inputFecha').value = "";
+            document.getElementById('badgeEstadoIA').innerText = "Modo Básico (Sin Key)";
+            document.getElementById('badgeEstadoIA').className = "text-[10px] font-extrabold uppercase bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full";
+
             document.getElementById('loaderIA').classList.add('hidden');
         }
 
-        function parserLocalAvanzado(txt) {
-            let cliente = "";
-            const matchCliente = txt.match(/(?:señora|sra|de|para)\s+([a-záéíóúñ]+)/i);
-            if (matchCliente && !['retirar', 'la', 'un', 'una', 'dos', 'tres'].includes(matchCliente[1].toLowerCase())) {
-                cliente = capitalizar(matchCliente[1]);
-            }
-
-            let barrio = "";
-            const matchBarrio = txt.match(/en\s+([a-záéíóúñ\s]+?)(?=\s+y|\s+se|\s+para|\.|$)/i);
-            if (matchBarrio) barrio = capitalizar(matchBarrio[1].trim());
-
-            document.getElementById('inputCliente').value = cliente || "Agustina";
-            document.getElementById('inputUbicacion').value = barrio || "San Isidro Chico";
-            document.getElementById('inputTareas').value = "• 3 pantalones (cambio de cierre y ruedo)\n• 1 vestido (agrandar a los costados)\n• Medias (poner voladillos)";
-            document.getElementById('inputFecha').value = `${hoyObj.getFullYear()}-10-10`;
-        }
-
         function configurarAPIKey() {
-            const key = prompt("Ingresá tu API Key de Google Gemini (Gratis en AI Studio):", apiKey);
+            const key = prompt("Pegá tu API Key de Gemini aquí:", apiKey);
             if (key !== null) {
                 apiKey = key.trim();
                 localStorage.setItem('gemini_api_key', apiKey);
-                alert("¡API Key guardada correctamente!");
+                actualizarEstadoBotonKey();
+                if(apiKey) alert("¡Clave cargada e instalada con éxito!");
             }
         }
 
-        function capitalizar(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
-
         function guardarTrabajo() {
-            const cliente = document.getElementById('inputCliente').value;
+            const cliente = document.getElementById('inputCliente').value || "Clienta";
             const tareas = document.getElementById('inputTareas').value;
             const fechaEntrega = document.getElementById('inputFecha').value;
 
-            if (!cliente || !tareas) { alert('Por favor completá los datos del trabajo.'); return; }
+            if (!tareas) { alert('Por favor dictá o escribí las tareas.'); return; }
 
             const nuevo = {
                 id: Date.now(),
@@ -259,7 +261,7 @@ Campos a devolver en JSON:
             const difDias = Math.ceil((fEntrega - fHoy) / (1000 * 60 * 60 * 24));
 
             if (difDias < 0) return { texto: '🚨 RETRASADO', clase: 'bg-rose-600 text-white animate-pulse' };
-            if (difDias <= 1) return { texto: '🔴 URGENTE (1 día)', clase: 'bg-rose-500 text-white font-extrabold' };
+            if (difDias <= 1) return { texto: '🔴 URGENTE (Para Mañana/Hoy)', clase: 'bg-rose-500 text-white font-extrabold' };
             if (difDias <= 3) return { texto: `🟠 PRÓXIMO (${difDias} días)`, clase: 'bg-amber-500 text-white font-bold' };
             return { texto: `🟢 A TIEMPO (${difDias} días)`, clase: 'bg-emerald-500 text-white font-bold' };
         }
@@ -315,7 +317,7 @@ Campos a devolver en JSON:
         function borrarTrabajo(id) { trabajos = trabajos.filter(t => t.id !== id); guardarLocal(); renderTrabajos(); }
         function enviarWhatsApp(cliente, fecha) { window.open(`https://wa.me/?text=${encodeURIComponent(`¡Hola ${cliente}! Te aviso que tus prendas están listas para entregar. Un saludo!`)}`, '_blank'); }
         function limpiarForm() { document.getElementById('inputCliente').value = ''; document.getElementById('inputUbicacion').value = ''; document.getElementById('inputTareas').value = ''; document.getElementById('inputFecha').value = ''; }
-        function guardarLocal() { localStorage.setItem('agenda_modista_ia', JSON.stringify(trabajos)); }
+        function guardarLocal() { localStorage.setItem('agenda_modista_v3', JSON.stringify(trabajos)); }
         function formatearFechaLarga(fechaStr) { const partes = fechaStr.split('-'); return `${partes[2]}/${partes[1]}/${partes[0]}`; }
 
         renderTrabajos();
