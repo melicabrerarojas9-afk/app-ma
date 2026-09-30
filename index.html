@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Taller IA</title>
+    <title>Agenda de Taller</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -22,16 +22,16 @@
     <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80 px-4 py-3 flex justify-between items-center shadow-sm">
         <div class="flex items-center gap-2.5">
             <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
-                <i class="fa-solid fa-wand-magic-sparkles text-sm"></i>
+                <i class="fa-solid fa-scissors text-sm"></i>
             </div>
             <div>
-                <h1 class="font-extrabold text-slate-800 text-base leading-tight">Mi Agenda IA</h1>
+                <h1 class="font-extrabold text-slate-800 text-base leading-tight">Mi Agenda Taller</h1>
                 <p id="lblFechaHoy" class="text-[11px] text-rose-500 font-bold">Cargando fecha...</p>
             </div>
         </div>
-        <button id="btnApiKey" onclick="configurarAPIKey()" class="bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs px-3 py-2 rounded-xl font-bold flex items-center gap-1.5 border border-slate-200">
-            <i class="fa-solid fa-key text-rose-500"></i> <span id="txtBtnKey">Cargar Clave</span>
-        </button>
+        <span class="text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full border border-emerald-200">
+            100% Automático
+        </span>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-5">
@@ -39,7 +39,7 @@
         <section class="bg-gradient-to-b from-white to-slate-50 rounded-3xl p-5 shadow-sm border border-slate-200/80 text-center relative overflow-hidden">
             <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-rose-400 to-pink-500 rounded-b-full"></div>
             
-            <p class="text-[10px] font-extrabold uppercase tracking-wider text-rose-500 mb-1">Dictado por Voz</p>
+            <p class="text-[10px] font-extrabold uppercase tracking-wider text-rose-500 mb-1">Dictado Directo por Voz</p>
             <h2 class="text-base font-bold text-slate-800 mb-3">Tocá y dictá todo de corrido</h2>
 
             <div class="relative w-20 h-20 mx-auto mb-3 flex items-center justify-center">
@@ -49,7 +49,6 @@
             </div>
 
             <div id="statusDictado" class="text-xs font-bold text-slate-500">Tocá para hablar</div>
-            <div id="loaderIA" class="hidden text-xs font-bold text-rose-600 animate-pulse mt-2"><i class="fa-solid fa-spinner fa-spin"></i> La IA está organizando el pedido...</div>
         </section>
 
         <section id="secFormulario" class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-3">
@@ -58,23 +57,22 @@
                     <i class="fa-solid fa-list-check text-rose-500"></i>
                     <span>Pedido Detectado</span>
                 </h3>
-                <span id="badgeEstadoIA" class="text-[10px] font-extrabold uppercase bg-slate-100 text-slate-500 px-2.5 py-1 rounded-full">Sin procesar</span>
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
                 <div>
                     <label class="text-[11px] font-semibold text-slate-400 block mb-1">Clienta</label>
-                    <input type="text" id="inputCliente" placeholder="Nombre de la clienta" class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 border border-slate-200/80 outline-none">
+                    <input type="text" id="inputCliente" placeholder="Nombre clienta" class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 border border-slate-200/80 outline-none">
                 </div>
                 <div>
                     <label class="text-[11px] font-semibold text-slate-400 block mb-1">Zona / Barrio</label>
-                    <input type="text" id="inputUbicacion" placeholder="Ej: San Isidro Chico" class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 border border-slate-200/80 outline-none">
+                    <input type="text" id="inputUbicacion" placeholder="Ubicación" class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 border border-slate-200/80 outline-none">
                 </div>
             </div>
 
             <div>
-                <label class="text-[11px] font-semibold text-slate-400 block mb-1">Prendas y Trabajos a realizar</label>
-                <textarea id="inputTareas" rows="4" placeholder="Lista de prendas..." class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200/80 outline-none leading-relaxed"></textarea>
+                <label class="text-[11px] font-semibold text-slate-400 block mb-1">Lista de Tareas / Prendas</label>
+                <textarea id="inputTareas" rows="4" placeholder="Trabajos a realizar..." class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200/80 outline-none leading-relaxed"></textarea>
             </div>
 
             <div class="grid grid-cols-2 gap-2.5">
@@ -109,8 +107,7 @@
     </main>
 
     <script>
-        let trabajos = JSON.parse(localStorage.getItem('agenda_modista_v3')) || [];
-        let apiKey = localStorage.getItem('gemini_api_key') || "";
+        let trabajos = JSON.parse(localStorage.getItem('agenda_modista_v4')) || [];
         let rec = null;
         let escuchando = false;
 
@@ -118,15 +115,6 @@
         const fechaHoyISO = hoyObj.toISOString().split('T')[0];
         document.getElementById('lblFechaHoy').innerText = `Hoy: ${formatearFechaLarga(fechaHoyISO)}`;
         document.getElementById('inputFechaRetiro').value = fechaHoyISO;
-
-        actualizarEstadoBotonKey();
-
-        function actualizarEstadoBotonKey() {
-            if (apiKey) {
-                document.getElementById('txtBtnKey').innerText = "IA Activa ✓";
-                document.getElementById('btnApiKey').className = "bg-emerald-50 text-emerald-700 text-xs px-3 py-2 rounded-xl font-bold flex items-center gap-1.5 border border-emerald-200";
-            }
-        }
 
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -150,7 +138,7 @@
 
             rec.onresult = (e) => {
                 const texto = e.results[0][0].transcript;
-                procesarDictadoConIA(texto);
+                procesarDictadoInteligente(texto);
             };
         }
 
@@ -162,73 +150,69 @@
             if (escuchando) { rec.stop(); } else { rec.start(); }
         }
 
-        async function procesarDictadoConIA(textoOriginal) {
-            document.getElementById('loaderIA').classList.remove('hidden');
+        function procesarDictadoInteligente(t) {
+            let texto = t.trim();
 
-            if (apiKey) {
-                try {
-                    const prompt = `Sos el asistente de un taller de costura. Analizá el siguiente audio dictado por la modista y extraé los datos en formato JSON estricto.
+            // 1. Extraer Nombre de Clienta
+            let cliente = "";
+            const matchCliente = texto.match(/(?:señora|sra|de|para|clienta)\s+([a-záéíóúñ]+)/i);
+            if (matchCliente && !['retirado', 'la', 'un', 'una', 'dos', 'tres', 'casa'].includes(matchCliente[1].toLowerCase())) {
+                cliente = capitalizar(matchCliente[1]);
+            }
 
-Texto dictado: "${textoOriginal}"
-
-Fecha de hoy: ${fechaHoyISO} (${hoyObj.getFullYear()}).
-
-Respondé ÚNICAMENTE con un objeto JSON con este formato (sin bloques markdown ni explicaciones):
-{
-  "clienta": "Nombre de la clienta (omitir palabras como 'retiro', 'señora', 'de la casa')",
-  "barrio": "Barrio o ubicación mencionada (ej: San Isidro Chico)",
-  "tareas": ["Lista detallada de cada prenda con su arreglo (ej: 'Agrandar vestido al largo', '3 pantalones sastreros (hacer ruedo)', '1 cartera (arreglar y cambiar cierre)')"],
-  "fechaEntrega": "Fecha en formato YYYY-MM-DD. Si dice 'mañana' es el día posterior a hoy (${fechaHoyISO}). Si dice un día específico calcúlalo respecto a hoy."
-}`;
-
-                    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            contents: [{ parts: [{ text: prompt }] }]
-                        })
-                    });
-
-                    const data = await response.json();
-                    let rawText = data.candidates[0].content.parts[0].text;
-                    rawText = rawText.replace(/```json|```/g, '').trim();
-                    const jsonRes = JSON.parse(rawText);
-
-                    document.getElementById('inputCliente').value = jsonRes.clienta || "";
-                    document.getElementById('inputUbicacion').value = jsonRes.barrio || "";
-                    document.getElementById('inputTareas').value = jsonRes.tareas ? jsonRes.tareas.map(t => `• ${t}`).join('\n') : textoOriginal;
-                    document.getElementById('inputFecha').value = jsonRes.fechaEntrega || "";
-
-                    document.getElementById('badgeEstadoIA').innerText = "Procesado con IA ✓";
-                    document.getElementById('badgeEstadoIA').className = "text-[10px] font-extrabold uppercase bg-emerald-100 text-emerald-700 px-2.5 py-1 rounded-full";
-                    document.getElementById('loaderIA').classList.add('hidden');
-                    return;
-                } catch (err) {
-                    console.error("Error al consultar la IA:", err);
-                    alert("Hubo un detalle al conectar con la IA. Asegurate de que la clave cargada sea válida.");
+            // 2. Extraer Ubicación / Barrio
+            let barrio = "";
+            const matchBarrio = texto.match(/(?:en|de)\s+([a-záéíóúñ\s]+?)(?=\s*,|\s+tengo|\s+para|\s+el|\.|$)/i);
+            if (matchBarrio) {
+                const posibleBarrio = matchBarrio[1].trim();
+                if (!posibleBarrio.includes('casa') && posibleBarrio.length < 25) {
+                    barrio = capitalizar(posibleBarrio);
                 }
             }
 
-            // Si no hay API Key o falla, se cargan los datos crudos reales (NUNCA DATOS FALSOS)
-            document.getElementById('inputCliente').value = "";
-            document.getElementById('inputUbicacion').value = "";
-            document.getElementById('inputTareas').value = textoOriginal;
-            document.getElementById('inputFecha').value = "";
-            document.getElementById('badgeEstadoIA').innerText = "Modo Básico (Sin Key)";
-            document.getElementById('badgeEstadoIA').className = "text-[10px] font-extrabold uppercase bg-amber-100 text-amber-700 px-2.5 py-1 rounded-full";
-
-            document.getElementById('loaderIA').classList.add('hidden');
-        }
-
-        function configurarAPIKey() {
-            const key = prompt("Pegá tu API Key de Gemini aquí:", apiKey);
-            if (key !== null) {
-                apiKey = key.trim();
-                localStorage.setItem('gemini_api_key', apiKey);
-                actualizarEstadoBotonKey();
-                if(apiKey) alert("¡Clave cargada e instalada con éxito!");
+            // 3. Extraer Fecha de Entrega
+            let fechaEntrega = new Date();
+            if (texto.toLowerCase().includes('mañana')) {
+                fechaEntrega.setDate(fechaEntrega.getDate() + 1);
+            } else if (texto.toLowerCase().includes('pasado mañana')) {
+                fechaEntrega.setDate(fechaEntrega.getDate() + 2);
+            } else {
+                const matchMes = texto.match(/(\d{1,2})\s+de\s+([a-z]+)/i);
+                if (matchMes) {
+                    const meses = { 'enero':0, 'febrero':1, 'marzo':2, 'abril':3, 'mayo':4, 'junio':5, 'julio':6, 'agosto':7, 'septiembre':8, 'octubre':9, 'noviembre':10, 'diciembre':11 };
+                    const dia = parseInt(matchMes[1]);
+                    const mes = meses[matchMes[2].toLowerCase()];
+                    if (mes !== undefined) {
+                        fechaEntrega.setMonth(mes);
+                        fechaEntrega.setDate(dia);
+                    }
+                } else {
+                    fechaEntrega.setDate(fechaEntrega.getDate() + 3); // 3 días por defecto
+                }
             }
+
+            // 4. Limpiar y separar lista de prendas por frases
+            let frases = texto.split(/(?:,|\sy\s|\se\s|\stengo que\s)/i);
+            let tareasListas = [];
+
+            frases.forEach(f => {
+                let limpia = f.replace(/(retiro de la casa de|la señora|en San Isidro|para el día de|mañana|tengo que|hacer|arreglar)/gi, '').trim();
+                if (limpia.length > 3) {
+                    tareasListas.push(`• ${capitalizar(limpia)}`);
+                }
+            });
+
+            if (tareasListas.length === 0) {
+                tareasListas.push(`• ${capitalizar(texto)}`);
+            }
+
+            document.getElementById('inputCliente').value = cliente || "";
+            document.getElementById('inputUbicacion').value = barrio || "";
+            document.getElementById('inputTareas').value = tareasListas.join('\n');
+            document.getElementById('inputFecha').value = fechaEntrega.toISOString().split('T')[0];
         }
+
+        function capitalizar(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 
         function guardarTrabajo() {
             const cliente = document.getElementById('inputCliente').value || "Clienta";
@@ -317,7 +301,7 @@ Respondé ÚNICAMENTE con un objeto JSON con este formato (sin bloques markdown 
         function borrarTrabajo(id) { trabajos = trabajos.filter(t => t.id !== id); guardarLocal(); renderTrabajos(); }
         function enviarWhatsApp(cliente, fecha) { window.open(`https://wa.me/?text=${encodeURIComponent(`¡Hola ${cliente}! Te aviso que tus prendas están listas para entregar. Un saludo!`)}`, '_blank'); }
         function limpiarForm() { document.getElementById('inputCliente').value = ''; document.getElementById('inputUbicacion').value = ''; document.getElementById('inputTareas').value = ''; document.getElementById('inputFecha').value = ''; }
-        function guardarLocal() { localStorage.setItem('agenda_modista_v3', JSON.stringify(trabajos)); }
+        function guardarLocal() { localStorage.setItem('agenda_modista_v4', JSON.stringify(trabajos)); }
         function formatearFechaLarga(fechaStr) { const partes = fechaStr.split('-'); return `${partes[2]}/${partes[1]}/${partes[0]}`; }
 
         renderTrabajos();
