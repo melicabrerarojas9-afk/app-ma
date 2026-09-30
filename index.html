@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda de Taller</title>
+    <title>Agenda de Taller - Por Zonas</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -15,294 +15,339 @@
             70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(225, 29, 72, 0); }
             100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
         }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="pb-24 text-slate-800">
+<body class="pb-28 text-slate-800">
 
-    <header class="bg-white/90 backdrop-blur-md sticky top-0 z-50 border-b border-slate-200/80 px-4 py-3 flex justify-between items-center shadow-sm">
+    <!-- Header Principal -->
+    <header class="bg-white sticky top-0 z-40 border-b border-slate-200 px-4 py-3 shadow-sm flex justify-between items-center">
         <div class="flex items-center gap-2.5">
-            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
-                <i class="fa-solid fa-scissors text-sm"></i>
+            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
+                <i class="fa-solid fa-scissors text-base"></i>
             </div>
             <div>
-                <h1 class="font-extrabold text-slate-800 text-base leading-tight">Mi Agenda Taller</h1>
+                <h1 class="font-black text-slate-800 text-base leading-tight">Mi Agenda de Costura</h1>
                 <p id="lblFechaHoy" class="text-[11px] text-rose-500 font-bold">Cargando fecha...</p>
             </div>
         </div>
-        <span class="text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-600 px-2.5 py-1 rounded-full border border-emerald-200">
-            100% Automático
-        </span>
+        <div class="bg-rose-50 text-rose-600 font-black text-xs px-3 py-1.5 rounded-xl border border-rose-100 flex items-center gap-1">
+            <span id="cantPendientes">0</span> pendientes
+        </div>
     </header>
 
-    <main class="max-w-md mx-auto p-4 space-y-5">
+    <main class="max-w-2xl mx-auto p-4 space-y-5">
 
-        <section class="bg-gradient-to-b from-white to-slate-50 rounded-3xl p-5 shadow-sm border border-slate-200/80 text-center relative overflow-hidden">
-            <div class="absolute top-0 left-1/2 -translate-x-1/2 w-32 h-1 bg-gradient-to-r from-rose-400 to-pink-500 rounded-b-full"></div>
-            
-            <p class="text-[10px] font-extrabold uppercase tracking-wider text-rose-500 mb-1">Dictado Directo por Voz</p>
-            <h2 class="text-base font-bold text-slate-800 mb-3">Tocá y dictá todo de corrido</h2>
-
-            <div class="relative w-20 h-20 mx-auto mb-3 flex items-center justify-center">
-                <button id="btnMic" onclick="toggleDictado()" class="w-16 h-16 bg-gradient-to-tr from-rose-500 to-pink-500 text-white rounded-full flex items-center justify-center text-2xl shadow-lg shadow-rose-500/30 transition-all active:scale-90 z-10">
-                    <i id="micIcon" class="fa-solid fa-microphone"></i>
-                </button>
+        <!-- Barra de Filtros por Barrio -->
+        <section class="space-y-2">
+            <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider block px-1">Filtrar por Zona / Barrio:</span>
+            <div id="contenedorFiltros" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
+                <!-- Se generan dinámicamente -->
             </div>
-
-            <div id="statusDictado" class="text-xs font-bold text-slate-500">Tocá para hablar</div>
         </section>
 
-        <section id="secFormulario" class="bg-white rounded-3xl p-5 shadow-sm border border-slate-200/80 space-y-3">
-            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
-                <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-list-check text-rose-500"></i>
-                    <span>Pedido Detectado</span>
-                </h3>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                    <label class="text-[11px] font-semibold text-slate-400 block mb-1">Clienta</label>
-                    <input type="text" id="inputCliente" placeholder="Nombre clienta" class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 border border-slate-200/80 outline-none">
-                </div>
-                <div>
-                    <label class="text-[11px] font-semibold text-slate-400 block mb-1">Zona / Barrio</label>
-                    <input type="text" id="inputUbicacion" placeholder="Ubicación" class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-bold text-slate-700 border border-slate-200/80 outline-none">
-                </div>
-            </div>
-
-            <div>
-                <label class="text-[11px] font-semibold text-slate-400 block mb-1">Lista de Tareas / Prendas</label>
-                <textarea id="inputTareas" rows="4" placeholder="Trabajos a realizar..." class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-semibold text-slate-700 border border-slate-200/80 outline-none leading-relaxed"></textarea>
-            </div>
-
-            <div class="grid grid-cols-2 gap-2.5">
-                <div>
-                    <label class="text-[11px] font-semibold text-slate-400 block mb-1">Retirado el (Hoy)</label>
-                    <input type="text" id="inputFechaRetiro" readonly class="w-full px-3 py-2 bg-slate-100 rounded-xl text-xs font-semibold text-slate-500 border border-slate-200/60 cursor-not-allowed">
-                </div>
-                <div>
-                    <label class="text-[11px] font-semibold text-slate-400 block mb-1">Fecha de Entrega</label>
-                    <input type="date" id="inputFecha" class="w-full px-3 py-2 bg-slate-50 rounded-xl text-xs font-bold text-rose-600 border border-slate-200/80 outline-none">
-                </div>
-            </div>
-
-            <button onclick="guardarTrabajo()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3 rounded-2xl shadow-lg shadow-slate-900/10 active:scale-98 transition-all flex items-center justify-center gap-2 mt-2">
-                <i class="fa-solid fa-plus text-xs"></i>
-                <span>Guardar en la Agenda</span>
-            </button>
-        </section>
-
-        <section class="space-y-3">
-            <div class="flex items-center justify-between px-1">
-                <h3 class="font-extrabold text-slate-800 text-sm flex items-center gap-2">
-                    <i class="fa-solid fa-calendar-week text-rose-500"></i>
-                    <span>Trabajos Pendientes</span>
-                </h3>
-                <span id="cantTrabajos" class="text-xs font-bold bg-rose-100 text-rose-600 px-2.5 py-0.5 rounded-full">0</span>
-            </div>
-
-            <div id="listaTrabajos" class="space-y-3"></div>
-        </section>
+        <!-- Contenedor Principal Agrupado -->
+        <div id="listaTrabajos" class="space-y-6">
+            <!-- Se llena dinámicamente por grupos de zonas -->
+        </div>
 
     </main>
 
+    <!-- BOTÓN FLOTANTE PARA NUEVO TRABAJO (+) -->
+    <div class="fixed bottom-6 right-6 z-40">
+        <button onclick="abrirModal()" class="bg-gradient-to-tr from-rose-500 to-pink-500 text-white font-extrabold text-sm px-5 py-4 rounded-full shadow-xl shadow-rose-500/40 flex items-center gap-2.5 active:scale-95 transition-all border-2 border-white">
+            <i class="fa-solid fa-plus text-base"></i>
+            <span>Anotar Trabajo</span>
+        </button>
+    </div>
+
+    <!-- MODAL / VENTANA EMERGENTE PARA CARGAR -->
+    <div id="modalDictado" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
+        <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
+                    <i class="fa-solid fa-file-circle-plus text-rose-500"></i>
+                    <span>Anotar Nuevo Pedido</span>
+                </h3>
+                <button onclick="cerrarModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-sm">✕</button>
+            </div>
+
+            <!-- 1. Nombre de Clienta -->
+            <div>
+                <label class="text-[11px] font-extrabold text-slate-400 block mb-1 uppercase tracking-wider">1. Nombre de la Clienta:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="inputCliente" placeholder="Ej: Melisa" class="w-full px-3 py-2.5 bg-slate-50 rounded-2xl text-xs font-bold text-slate-800 border border-slate-200 outline-none">
+                    <button onclick="dictarEnCampo('inputCliente', this)" class="bg-rose-50 text-rose-600 w-11 h-10 rounded-2xl flex items-center justify-center text-sm font-bold shrink-0 border border-rose-100 active:scale-95 transition-all">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 2. Barrio / Ubicación -->
+            <div>
+                <label class="text-[11px] font-extrabold text-slate-400 block mb-1 uppercase tracking-wider">2. Barrio / Ubicación:</label>
+                <div class="flex gap-2">
+                    <input type="text" id="inputBarrio" placeholder="Ej: La Horqueta, Nordelta, San Isidro Chico..." class="w-full px-3 py-2.5 bg-slate-50 rounded-2xl text-xs font-bold text-slate-800 border border-slate-200 outline-none">
+                    <button onclick="dictarEnCampo('inputBarrio', this)" class="bg-rose-50 text-rose-600 w-11 h-10 rounded-2xl flex items-center justify-center text-sm font-bold shrink-0 border border-rose-100 active:scale-95 transition-all">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 3. Detalle de Trabajos -->
+            <div>
+                <label class="text-[11px] font-extrabold text-slate-400 block mb-1 uppercase tracking-wider">3. Tareas a realizar:</label>
+                <div class="relative">
+                    <textarea id="txtDictado" rows="3" placeholder="Ej: Cambiar cierre de pantalón. Agregar botones de camisa. Alargar vestido" class="w-full p-3 bg-slate-50 rounded-2xl text-xs font-semibold text-slate-800 border border-slate-200 outline-none leading-relaxed pr-12"></textarea>
+                    <button onclick="dictarEnCampo('txtDictado', this)" class="absolute right-2 top-2 bg-rose-50 text-rose-600 w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold border border-rose-100 active:scale-95 transition-all">
+                        <i class="fa-solid fa-microphone"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 4. Fecha de Entrega -->
+            <div>
+                <label class="text-[11px] font-extrabold text-rose-500 block mb-1 uppercase tracking-wider">4. Fecha de Entrega Estimada:</label>
+                <input type="date" id="inputFecha" class="w-full px-3 py-2.5 bg-rose-50/50 rounded-xl text-xs font-bold text-rose-600 border border-rose-200 outline-none">
+            </div>
+
+            <!-- Botón Guardar -->
+            <button onclick="guardarTrabajo()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 rounded-2xl shadow-lg active:scale-98 transition-all flex items-center justify-center gap-2">
+                <i class="fa-solid fa-check text-xs"></i>
+                <span>Guardar Trabajo en la Agenda</span>
+            </button>
+        </div>
+    </div>
+
     <script>
-        let trabajos = JSON.parse(localStorage.getItem('agenda_modista_v4')) || [];
+        let trabajos = JSON.parse(localStorage.getItem('agenda_modista_v10')) || [];
         let rec = null;
-        let escuchando = false;
+        let filtroBarrioActual = 'TODOS';
 
         const hoyObj = new Date();
         const fechaHoyISO = hoyObj.toISOString().split('T')[0];
         document.getElementById('lblFechaHoy').innerText = `Hoy: ${formatearFechaLarga(fechaHoyISO)}`;
-        document.getElementById('inputFechaRetiro').value = fechaHoyISO;
 
-        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+        const fDefecto = new Date();
+        fDefecto.setDate(fDefecto.getDate() + 3);
+        document.getElementById('inputFecha').value = fDefecto.toISOString().split('T')[0];
+
+        function dictarEnCampo(idCampo, btn) {
+            if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
+                alert('El dictado por voz funciona en Google Chrome o Samsung Internet.');
+                return;
+            }
+
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             rec = new SpeechRecognition();
             rec.lang = 'es-AR';
             rec.continuous = false;
 
-            rec.onstart = () => {
-                escuchando = true;
-                document.getElementById('btnMic').classList.add('pulse-mic');
-                document.getElementById('micIcon').className = 'fa-solid fa-square';
-                document.getElementById('statusDictado').innerText = 'Escuchando... Hablá tranquila.';
-            };
-
-            rec.onend = () => {
-                escuchando = false;
-                document.getElementById('btnMic').classList.remove('pulse-mic');
-                document.getElementById('micIcon').className = 'fa-solid fa-microphone';
-                document.getElementById('statusDictado').innerText = 'Tocá para hablar';
-            };
+            rec.onstart = () => { btn.classList.add('pulse-mic'); };
+            rec.onend = () => { btn.classList.remove('pulse-mic'); };
 
             rec.onresult = (e) => {
                 const texto = e.results[0][0].transcript;
-                procesarDictadoInteligente(texto);
+                const campo = document.getElementById(idCampo);
+                campo.value = campo.value ? `${campo.value}. ${texto}` : texto;
             };
+
+            rec.start();
         }
 
-        function toggleDictado() {
-            if (!rec) {
-                alert('El dictado funciona mejor en Google Chrome o Samsung Internet.');
-                return;
-            }
-            if (escuchando) { rec.stop(); } else { rec.start(); }
+        function abrirModal() { document.getElementById('modalDictado').classList.remove('hidden'); }
+        function cerrarModal() { document.getElementById('modalDictado').classList.add('hidden'); }
+
+        function capitalizar(str) {
+            if (!str) return '';
+            return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         }
 
-        function procesarDictadoInteligente(t) {
-            let texto = t.trim();
+        function formatearEnItems(texto) {
+            if (!texto) return '';
+            let preparado = texto.replace(/(cambiar|hacer|alargar|achicar|arreglar|realizar|poner|agregar)/gi, " | $1");
+            const partes = preparado.split(/(?:\||,|\sy\s|\se\s|\.|\n)/i);
 
-            // 1. Extraer Nombre de Clienta
-            let cliente = "";
-            const matchCliente = texto.match(/(?:señora|sra|de|para|clienta)\s+([a-záéíóúñ]+)/i);
-            if (matchCliente && !['retirado', 'la', 'un', 'una', 'dos', 'tres', 'casa'].includes(matchCliente[1].toLowerCase())) {
-                cliente = capitalizar(matchCliente[1]);
-            }
+            const items = partes
+                .map(p => p.trim())
+                .filter(p => p.length > 2)
+                .map(p => `• ${p.charAt(0).toUpperCase() + p.slice(1)}`);
 
-            // 2. Extraer Ubicación / Barrio
-            let barrio = "";
-            const matchBarrio = texto.match(/(?:en|de)\s+([a-záéíóúñ\s]+?)(?=\s*,|\s+tengo|\s+para|\s+el|\.|$)/i);
-            if (matchBarrio) {
-                const posibleBarrio = matchBarrio[1].trim();
-                if (!posibleBarrio.includes('casa') && posibleBarrio.length < 25) {
-                    barrio = capitalizar(posibleBarrio);
-                }
-            }
-
-            // 3. Extraer Fecha de Entrega
-            let fechaEntrega = new Date();
-            if (texto.toLowerCase().includes('mañana')) {
-                fechaEntrega.setDate(fechaEntrega.getDate() + 1);
-            } else if (texto.toLowerCase().includes('pasado mañana')) {
-                fechaEntrega.setDate(fechaEntrega.getDate() + 2);
-            } else {
-                const matchMes = texto.match(/(\d{1,2})\s+de\s+([a-z]+)/i);
-                if (matchMes) {
-                    const meses = { 'enero':0, 'febrero':1, 'marzo':2, 'abril':3, 'mayo':4, 'junio':5, 'julio':6, 'agosto':7, 'septiembre':8, 'octubre':9, 'noviembre':10, 'diciembre':11 };
-                    const dia = parseInt(matchMes[1]);
-                    const mes = meses[matchMes[2].toLowerCase()];
-                    if (mes !== undefined) {
-                        fechaEntrega.setMonth(mes);
-                        fechaEntrega.setDate(dia);
-                    }
-                } else {
-                    fechaEntrega.setDate(fechaEntrega.getDate() + 3); // 3 días por defecto
-                }
-            }
-
-            // 4. Limpiar y separar lista de prendas por frases
-            let frases = texto.split(/(?:,|\sy\s|\se\s|\stengo que\s)/i);
-            let tareasListas = [];
-
-            frases.forEach(f => {
-                let limpia = f.replace(/(retiro de la casa de|la señora|en San Isidro|para el día de|mañana|tengo que|hacer|arreglar)/gi, '').trim();
-                if (limpia.length > 3) {
-                    tareasListas.push(`• ${capitalizar(limpia)}`);
-                }
-            });
-
-            if (tareasListas.length === 0) {
-                tareasListas.push(`• ${capitalizar(texto)}`);
-            }
-
-            document.getElementById('inputCliente').value = cliente || "";
-            document.getElementById('inputUbicacion').value = barrio || "";
-            document.getElementById('inputTareas').value = tareasListas.join('\n');
-            document.getElementById('inputFecha').value = fechaEntrega.toISOString().split('T')[0];
+            return items.length > 0 ? items.join('\n') : `• ${texto}`;
         }
-
-        function capitalizar(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
 
         function guardarTrabajo() {
-            const cliente = document.getElementById('inputCliente').value || "Clienta";
-            const tareas = document.getElementById('inputTareas').value;
+            const rawCliente = document.getElementById('inputCliente').value || "Clienta Sin Nombre";
+            const rawBarrio = document.getElementById('inputBarrio').value || "Sin Zona / Taller";
+            const rawDetalle = document.getElementById('txtDictado').value;
             const fechaEntrega = document.getElementById('inputFecha').value;
 
-            if (!tareas) { alert('Por favor dictá o escribí las tareas.'); return; }
+            if (!rawDetalle) {
+                alert('Por favor anotá o dictá las prendas y arreglos a realizar.');
+                return;
+            }
 
             const nuevo = {
                 id: Date.now(),
-                cliente,
-                ubicacion: document.getElementById('inputUbicacion').value,
-                tareas,
+                cliente: capitalizar(rawCliente),
+                barrio: capitalizar(rawBarrio),
+                detalle: formatearEnItems(rawDetalle),
                 fechaRetiro: fechaHoyISO,
                 fechaEntrega,
                 completado: false
             };
 
-            trabajos.unshift(nuevo);
+            trabajos.push(nuevo);
             guardarLocal();
             renderTrabajos();
-            limpiarForm();
+            
+            document.getElementById('inputCliente').value = '';
+            document.getElementById('inputBarrio').value = '';
+            document.getElementById('txtDictado').value = '';
+            cerrarModal();
         }
 
         function obtenerCartelUrgencia(fechaEntregaStr) {
-            if (!fechaEntregaStr) return { texto: 'Sin Fecha', clase: 'bg-slate-100 text-slate-600' };
+            if (!fechaEntregaStr) return { texto: 'Sin Fecha', clase: 'bg-slate-100 text-slate-600', dias: 999 };
 
             const fEntrega = new Date(fechaEntregaStr + 'T00:00:00');
             const fHoy = new Date(fechaHoyISO + 'T00:00:00');
             const difDias = Math.ceil((fEntrega - fHoy) / (1000 * 60 * 60 * 24));
 
-            if (difDias < 0) return { texto: '🚨 RETRASADO', clase: 'bg-rose-600 text-white animate-pulse' };
-            if (difDias <= 1) return { texto: '🔴 URGENTE (Para Mañana/Hoy)', clase: 'bg-rose-500 text-white font-extrabold' };
-            if (difDias <= 3) return { texto: `🟠 PRÓXIMO (${difDias} días)`, clase: 'bg-amber-500 text-white font-bold' };
-            return { texto: `🟢 A TIEMPO (${difDias} días)`, clase: 'bg-emerald-500 text-white font-bold' };
+            if (difDias < 0) return { texto: '🚨 RETRASADO', clase: 'bg-rose-600 text-white animate-pulse', dias: difDias };
+            if (difDias <= 1) return { texto: '🔴 URGENTE', clase: 'bg-rose-500 text-white font-black', dias: difDias };
+            if (difDias <= 3) return { texto: `🟠 PRÓXIMO (${difDias} días)`, clase: 'bg-amber-500 text-white font-bold', dias: difDias };
+            return { texto: `🟢 A TIEMPO (${difDias} días)`, clase: 'bg-emerald-500 text-white font-bold', dias: difDias };
+        }
+
+        function renderFiltros(barriosDisponibles) {
+            const cont = document.getElementById('contenedorFiltros');
+            cont.innerHTML = '';
+
+            const todosBarrios = ['TODOS', ...barriosDisponibles];
+
+            todosBarrios.forEach(b => {
+                const btn = document.createElement('button');
+                const esActivo = filtroBarrioActual === b;
+                btn.className = `px-3.5 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition-all border ${esActivo ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`;
+                btn.innerText = b === 'TODOS' ? '📍 Todas las Zonas' : `📍 ${b}`;
+                btn.onclick = () => {
+                    filtroBarrioActual = b;
+                    renderTrabajos();
+                };
+                cont.appendChild(btn);
+            });
         }
 
         function renderTrabajos() {
             const cont = document.getElementById('listaTrabajos');
-            document.getElementById('cantTrabajos').innerText = trabajos.filter(t => !t.completado).length;
+            const pendientes = trabajos.filter(t => !t.completado);
+            document.getElementById('cantPendientes').innerText = pendientes.length;
             cont.innerHTML = '';
 
             if (trabajos.length === 0) {
-                cont.innerHTML = `<div class="text-center py-8 bg-white rounded-3xl border border-slate-200/60 p-4"><i class="fa-solid fa-circle-check text-emerald-400 text-3xl mb-2"></i><p class="text-xs font-bold text-slate-600">¡Agenda al día!</p></div>`;
+                cont.innerHTML = `
+                    <div class="text-center py-12 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
+                        <i class="fa-solid fa-clipboard-check text-slate-300 text-4xl mb-3"></i>
+                        <p class="text-sm font-extrabold text-slate-700">¡No hay trabajos en la agenda!</p>
+                        <p class="text-xs text-slate-400 mt-1">Tocá el botón rosa de abajo para anotar el primero.</p>
+                    </div>
+                `;
+                renderFiltros([]);
                 return;
             }
 
-            trabajos.forEach(t => {
-                const urgencia = obtenerCartelUrgencia(t.fechaEntrega);
-                const div = document.createElement('div');
-                div.className = `bg-white p-4 rounded-3xl border ${t.completado ? 'opacity-50 border-slate-200' : 'border-slate-200/80 shadow-sm'} space-y-2.5`;
-                div.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h4 class="font-extrabold text-slate-800 text-sm ${t.completado ? 'line-through text-slate-400' : ''}">${t.cliente}</h4>
-                            ${t.ubicacion ? `<span class="text-[11px] text-slate-400 font-semibold"><i class="fa-solid fa-location-dot text-rose-400"></i> ${t.ubicacion}</span>` : ''}
-                        </div>
-                        <div class="flex flex-col items-end gap-1">
-                            ${!t.completado ? `<span class="text-[10px] px-2.5 py-0.5 rounded-full ${urgencia.clase}">${urgencia.texto}</span>` : ''}
-                            <button onclick="toggleEstado(${t.id})" class="text-[11px] px-2.5 py-0.5 rounded-full font-bold ${t.completado ? 'bg-slate-100 text-slate-500' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}">
-                                ${t.completado ? '✓ Listo' : 'Marcar Listo'}
-                            </button>
-                        </div>
-                    </div>
-                    <div class="text-xs text-slate-700 font-medium bg-slate-50 p-3 rounded-2xl border border-slate-100 leading-relaxed whitespace-pre-line">${t.tareas}</div>
-                    <div class="flex justify-between items-center pt-1 text-[11px]">
-                        <div class="text-slate-400">
-                            <span class="block text-[10px]">Retiro: ${t.fechaRetiro || 'Hoy'}</span>
-                            <span class="font-bold text-slate-700">Entrega: ${t.fechaEntrega || 'Sin fecha'}</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="enviarWhatsApp('${t.cliente}', '${t.fechaEntrega}')" class="text-emerald-600 font-bold bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl flex items-center gap-1">
-                                <i class="fa-brands fa-whatsapp text-xs"></i> Avisar
-                            </button>
-                            <button onclick="borrarTrabajo(${t.id})" class="text-slate-300 hover:text-rose-500 p-1">
-                                <i class="fa-solid fa-trash-can"></i>
-                            </button>
-                        </div>
+            // Obtener lista única de barrios
+            const barriosSet = new Set(trabajos.map(t => t.barrio || 'Sin Zona / Taller'));
+            const barriosArray = Array.from(barriosSet);
+            renderFiltros(barriosArray);
+
+            // Filtrar si hay una zona seleccionada
+            const listaFiltrada = filtroBarrioActual === 'TODOS' 
+                ? trabajos 
+                : trabajos.filter(t => (t.barrio || 'Sin Zona / Taller') === filtroBarrioActual);
+
+            // Agrupar por Barrio
+            const grupos = {};
+            listaFiltrada.forEach(t => {
+                const zona = t.barrio || 'Sin Zona / Taller';
+                if (!grupos[zona]) grupos[zona] = [];
+                grupos[zona].push(t);
+            });
+
+            // Renderizar cada Grupo de Barrio
+            Object.keys(grupos).forEach(zona => {
+                const sec = document.createElement('section');
+                sec.className = "space-y-3";
+
+                // Header de la Zona
+                sec.innerHTML = `
+                    <div class="flex items-center gap-2 px-1 border-b border-slate-200 pb-1.5">
+                        <i class="fa-solid fa-location-dot text-rose-500 text-sm"></i>
+                        <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide">${zona}</h3>
+                        <span class="text-[10px] font-bold bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">${grupos[zona].filter(t => !t.completado).length} pendientes</span>
                     </div>
                 `;
-                cont.appendChild(div);
+
+                const contenedorTarjetas = document.createElement('div');
+                contenedorTarjetas.className = "space-y-3";
+
+                // Ordenar por urgencia dentro del grupo
+                const ordenados = grupos[zona].sort((a, b) => {
+                    if (a.completado !== b.completado) return a.completado ? 1 : -1;
+                    return obtenerCartelUrgencia(a.fechaEntrega).dias - obtenerCartelUrgencia(b.fechaEntrega).dias;
+                });
+
+                ordenados.forEach(t => {
+                    const urgencia = obtenerCartelUrgencia(t.fechaEntrega);
+                    const div = document.createElement('div');
+                    div.className = `bg-white p-4 sm:p-5 rounded-3xl border ${t.completado ? 'opacity-50 border-slate-200 bg-slate-50' : 'border-slate-200 shadow-sm'} space-y-3 transition-all`;
+                    
+                    div.innerHTML = `
+                        <div class="flex flex-wrap justify-between items-start gap-2 border-b border-slate-100 pb-2.5">
+                            <div>
+                                <h4 class="font-black text-slate-900 text-base leading-tight ${t.completado ? 'line-through text-slate-400' : ''}">${t.cliente}</h4>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                ${!t.completado ? `<span class="text-[10px] px-2.5 py-1 rounded-full whitespace-nowrap ${urgencia.clase}">${urgencia.texto}</span>` : ''}
+                                <button onclick="toggleEstado(${t.id})" class="text-[11px] px-3 py-1 rounded-xl font-extrabold shrink-0 ${t.completado ? 'bg-slate-200 text-slate-600' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}">
+                                    ${t.completado ? '✓ Listo' : 'Marcar Listo'}
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- TAREAS DESGLOSADAS CON ÍTEMS -->
+                        <div class="text-xs sm:text-sm text-slate-800 font-bold bg-slate-50 p-3.5 rounded-2xl border border-slate-100 leading-relaxed whitespace-pre-line ${t.completado ? 'line-through text-slate-400' : ''}">${t.detalle}</div>
+
+                        <div class="flex flex-wrap justify-between items-center gap-2 pt-1 text-xs">
+                            <div class="text-[11px]">
+                                <span class="block text-slate-400 text-[10px] font-semibold">Retiro: ${formatearFechaLarga(t.fechaRetiro)}</span>
+                                <span class="font-black text-slate-800">Entrega: ${t.fechaEntrega ? formatearFechaLarga(t.fechaEntrega) : 'Sin fecha'}</span>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <button onclick="enviarWhatsApp('${t.cliente}', \`${t.detalle.replace(/'/g, "").replace(/\n/g, ", ")}\`)" class="text-emerald-600 font-bold bg-emerald-50 hover:bg-emerald-100 px-3 py-1.5 rounded-xl flex items-center gap-1 text-xs">
+                                    <i class="fa-brands fa-whatsapp text-sm"></i> Avisar
+                                </button>
+                                <button onclick="borrarTrabajo(${t.id})" class="text-slate-300 hover:text-rose-500 p-1.5">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    contenedorTarjetas.appendChild(div);
+                });
+
+                sec.appendChild(contenedorTarjetas);
+                cont.appendChild(sec);
             });
         }
 
         function toggleEstado(id) { trabajos = trabajos.map(t => t.id === id ? {...t, completado: !t.completado} : t); guardarLocal(); renderTrabajos(); }
         function borrarTrabajo(id) { trabajos = trabajos.filter(t => t.id !== id); guardarLocal(); renderTrabajos(); }
-        function enviarWhatsApp(cliente, fecha) { window.open(`https://wa.me/?text=${encodeURIComponent(`¡Hola ${cliente}! Te aviso que tus prendas están listas para entregar. Un saludo!`)}`, '_blank'); }
-        function limpiarForm() { document.getElementById('inputCliente').value = ''; document.getElementById('inputUbicacion').value = ''; document.getElementById('inputTareas').value = ''; document.getElementById('inputFecha').value = ''; }
-        function guardarLocal() { localStorage.setItem('agenda_modista_v4', JSON.stringify(trabajos)); }
-        function formatearFechaLarga(fechaStr) { const partes = fechaStr.split('-'); return `${partes[2]}/${partes[1]}/${partes[0]}`; }
+        function enviarWhatsApp(cliente, detalle) { window.open(`https://wa.me/?text=${encodeURIComponent(`¡Hola ${cliente}! Te aviso que tu pedido (${detalle}) ya está listo para retirar. ¡Un saludo!`)}`, '_blank'); }
+        function guardarLocal() { localStorage.setItem('agenda_modista_v10', JSON.stringify(trabajos)); }
+        function formatearFechaLarga(fechaStr) { if(!fechaStr) return ''; const partes = fechaStr.split('-'); return `${partes[2]}/${partes[1]}/${partes[0]}`; }
 
         renderTrabajos();
     </script>
