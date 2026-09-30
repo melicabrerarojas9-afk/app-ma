@@ -3,130 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda de Taller - Por Zonas</title>
-    <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"></script>
-    <link href="[https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css](https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css)" rel="stylesheet">
-    <link href="[https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap](https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap)" rel="stylesheet">
+    <title>Mi Agenda de Costura</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #f8fafc; }
-        .pulse-mic { animation: pulse-ring 1.8s cubic-bezier(0.215, 0.61, 0.355, 1) infinite; }
-        @keyframes pulse-ring {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0.6); }
-            70% { transform: scale(1.05); box-shadow: 0 0 0 20px rgba(225, 29, 72, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(225, 29, 72, 0); }
-        }
+        body { font-family: 'Plus Jakarta Sans', -apple-system, sans-serif; background-color: #f8fafc; color: #1e293b; margin: 0; padding-bottom: 110px; }
+        .card { background: #ffffff; border-radius: 20px; border: 1px solid #e2e8f0; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); margin-bottom: 12px; }
+        .btn-main { background: linear-gradient(135deg, #f43f5e, #ec4899); color: white; border: none; padding: 14px 20px; border-radius: 50px; font-weight: 800; font-size: 14px; box-shadow: 0 4px 12px rgba(244,63,94,0.3); cursor: pointer; }
+        .badge { display: inline-block; padding: 3px 10px; border-radius: 12px; font-size: 10px; font-weight: 800; }
+        .badge-urgente { background-color: #ef4444; color: white; }
+        .badge-proximo { background-color: #f59e0b; color: white; }
+        .badge-atiempo { background-color: #10b981; color: white; }
+        .badge-5dias { background-color: #ffe4e6; color: #e11d48; border: 1px solid #fecdd3; }
+        .item-line { display: block; margin-bottom: 4px; font-weight: 700; color: #334155; }
         .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pulse-mic { animation: pulse-ring 1.8s infinite; }
+        @keyframes pulse-ring { 0% { transform: scale(0.95); } 50% { transform: scale(1.05); } 100% { transform: scale(0.95); } }
     </style>
 </head>
-<body class="pb-28 text-slate-800">
+<body>
 
-    <!-- Header Principal -->
-    <header class="bg-white sticky top-0 z-40 border-b border-slate-200 px-4 py-3 shadow-sm flex justify-between items-center">
-        <div class="flex items-center gap-2.5">
-            <div class="w-10 h-10 rounded-2xl bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white shadow-md shadow-rose-500/20">
-                <i class="fa-solid fa-scissors text-base"></i>
+    <!-- Header -->
+    <header class="bg-white sticky top-0 z-40 border-b border-slate-200 px-4 py-3 flex justify-between items-center shadow-sm">
+        <div class="flex items-center gap-2">
+            <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-rose-500 to-pink-500 flex items-center justify-center text-white font-bold">
+                ✂️
             </div>
             <div>
-                <h1 class="font-black text-slate-800 text-base leading-tight">Mi Agenda de Costura</h1>
-                <p id="lblFechaHoy" class="text-[11px] text-rose-500 font-bold">Cargando fecha...</p>
+                <h1 class="font-extrabold text-slate-800 text-base leading-tight">Mi Agenda de Costura</h1>
+                <p id="lblFechaHoy" class="text-[11px] text-rose-500 font-bold">Cargando...</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
-            <button id="btnNotif" onclick="solicitarPermisoNotificaciones()" class="bg-slate-100 text-slate-600 font-bold text-xs p-2 rounded-xl border border-slate-200 flex items-center gap-1" title="Activar Notificaciones">
-                <i class="fa-solid fa-bell text-rose-500"></i>
+            <button id="btnNotif" onclick="solicitarPermisoNotificaciones()" class="bg-slate-100 text-slate-700 font-bold text-xs p-2 rounded-xl border border-slate-200" title="Activar Notificaciones">
+                🔔
             </button>
-            <div class="bg-rose-50 text-rose-600 font-black text-xs px-3 py-1.5 rounded-xl border border-rose-100 flex items-center gap-1">
+            <div class="bg-rose-50 text-rose-600 font-extrabold text-xs px-3 py-1.5 rounded-xl border border-rose-100">
                 <span id="cantPendientes">0</span> pendientes
             </div>
         </div>
     </header>
 
-    <main class="max-w-2xl mx-auto p-4 space-y-5">
+    <main class="max-w-md mx-auto p-4 space-y-4">
 
-        <!-- Barra de Filtros por Barrio -->
-        <section class="space-y-2">
-            <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider block px-1">Filtrar por Zona / Barrio:</span>
+        <!-- Barra de Filtros -->
+        <section>
+            <span class="text-[10px] font-black uppercase text-slate-400 tracking-wider block mb-1">Filtrar por Zona / Barrio:</span>
             <div id="contenedorFiltros" class="flex gap-2 overflow-x-auto no-scrollbar pb-1">
-                <!-- Se generan dinámicamente -->
+                <!-- Filtros -->
             </div>
         </section>
 
-        <!-- Contenedor Principal Agrupado -->
-        <div id="listaTrabajos" class="space-y-6">
-            <!-- Se llena dinámicamente por grupos de zonas -->
+        <!-- Lista Principal -->
+        <div id="listaTrabajos">
+            <!-- Se llena dinámicamente -->
         </div>
 
     </main>
 
-    <!-- BOTÓN FLOTANTE PARA NUEVO TRABAJO (+) -->
+    <!-- Botón Flotante -->
     <div class="fixed bottom-6 right-6 z-40">
-        <button onclick="abrirModal()" class="bg-gradient-to-tr from-rose-500 to-pink-500 text-white font-extrabold text-sm px-5 py-4 rounded-full shadow-xl shadow-rose-500/40 flex items-center gap-2.5 active:scale-95 transition-all border-2 border-white">
-            <i class="fa-solid fa-plus text-base"></i>
+        <button onclick="abrirModal()" class="btn-main flex items-center gap-2">
+            <span class="text-lg">＋</span>
             <span>Anotar Trabajo</span>
         </button>
     </div>
 
-    <!-- MODAL / VENTANA EMERGENTE PARA CARGAR -->
+    <!-- Modal para Cargar -->
     <div id="modalDictado" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-end sm:items-center justify-center p-0 sm:p-4">
-        <div class="bg-white w-full max-w-lg rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
+        <div class="bg-white w-full max-w-md rounded-t-3xl sm:rounded-3xl p-5 space-y-4 shadow-2xl max-h-[90vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-extrabold text-slate-800 text-base flex items-center gap-2">
-                    <i class="fa-solid fa-file-circle-plus text-rose-500"></i>
-                    <span>Anotar Nuevo Pedido</span>
-                </h3>
-                <button onclick="cerrarModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 flex items-center justify-center font-bold text-sm">✕</button>
+                <h3 class="font-extrabold text-slate-800 text-base">📝 Anotar Nuevo Pedido</h3>
+                <button onclick="cerrarModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-500 font-bold text-sm">✕</button>
             </div>
 
-            <!-- 1. Nombre de Clienta -->
+            <!-- 1. Clienta -->
             <div>
-                <label class="text-[11px] font-extrabold text-slate-400 block mb-1 uppercase tracking-wider">1. Nombre de la Clienta:</label>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">1. Nombre de la Clienta:</label>
                 <div class="flex gap-2">
-                    <input type="text" id="inputCliente" placeholder="Ej: Melisa" class="w-full px-3 py-2.5 bg-slate-50 rounded-2xl text-xs font-bold text-slate-800 border border-slate-200 outline-none">
-                    <button onclick="dictarEnCampo('inputCliente', this)" class="bg-rose-50 text-rose-600 w-11 h-10 rounded-2xl flex items-center justify-center text-sm font-bold shrink-0 border border-rose-100 active:scale-95 transition-all">
-                        <i class="fa-solid fa-microphone"></i>
-                    </button>
+                    <input type="text" id="inputCliente" placeholder="Ej: Melisa" class="w-full px-3 py-2.5 bg-slate-50 rounded-xl text-xs font-bold text-slate-800 border border-slate-200 outline-none">
+                    <button onclick="dictarEnCampo('inputCliente', this)" class="bg-rose-50 text-rose-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold shrink-0 border border-rose-100">🎤</button>
                 </div>
             </div>
 
-            <!-- 2. Barrio / Ubicación -->
+            <!-- 2. Barrio -->
             <div>
-                <label class="text-[11px] font-extrabold text-slate-400 block mb-1 uppercase tracking-wider">2. Barrio / Ubicación:</label>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">2. Barrio / Ubicación:</label>
                 <div class="flex gap-2">
-                    <input type="text" id="inputBarrio" placeholder="Ej: La Horqueta, Nordelta, San Isidro Chico..." class="w-full px-3 py-2.5 bg-slate-50 rounded-2xl text-xs font-bold text-slate-800 border border-slate-200 outline-none">
-                    <button onclick="dictarEnCampo('inputBarrio', this)" class="bg-rose-50 text-rose-600 w-11 h-10 rounded-2xl flex items-center justify-center text-sm font-bold shrink-0 border border-rose-100 active:scale-95 transition-all">
-                        <i class="fa-solid fa-microphone"></i>
-                    </button>
+                    <input type="text" id="inputBarrio" placeholder="Ej: Nordelta" class="w-full px-3 py-2.5 bg-slate-50 rounded-xl text-xs font-bold text-slate-800 border border-slate-200 outline-none">
+                    <button onclick="dictarEnCampo('inputBarrio', this)" class="bg-rose-50 text-rose-600 w-10 h-10 rounded-xl flex items-center justify-center font-bold shrink-0 border border-rose-100">🎤</button>
                 </div>
             </div>
 
-            <!-- 3. Detalle de Trabajos -->
+            <!-- 3. Tareas -->
             <div>
-                <label class="text-[11px] font-extrabold text-slate-400 block mb-1 uppercase tracking-wider">3. Tareas a realizar:</label>
+                <label class="text-[11px] font-bold text-slate-400 block mb-1">3. Tareas a realizar:</label>
                 <div class="relative">
-                    <textarea id="txtDictado" rows="3" placeholder="Ej: Cambiar cierre de pantalón. Agregar botones de camisa. Alargar vestido" class="w-full p-3 bg-slate-50 rounded-2xl text-xs font-semibold text-slate-800 border border-slate-200 outline-none leading-relaxed pr-12"></textarea>
-                    <button onclick="dictarEnCampo('txtDictado', this)" class="absolute right-2 top-2 bg-rose-50 text-rose-600 w-9 h-9 rounded-xl flex items-center justify-center text-sm font-bold border border-rose-100 active:scale-95 transition-all">
-                        <i class="fa-solid fa-microphone"></i>
-                    </button>
+                    <textarea id="txtDictado" rows="3" placeholder="Ej: Agrandar vestido. Cambiar cierre de pantalón" class="w-full p-3 bg-slate-50 rounded-xl text-xs font-semibold text-slate-800 border border-slate-200 outline-none leading-relaxed pr-10"></textarea>
+                    <button onclick="dictarEnCampo('txtDictado', this)" class="absolute right-2 top-2 bg-rose-50 text-rose-600 w-8 h-8 rounded-lg flex items-center justify-center font-bold border border-rose-100">🎤</button>
                 </div>
             </div>
 
-            <!-- 4. Fecha de Entrega -->
+            <!-- 4. Fecha -->
             <div>
-                <label class="text-[11px] font-extrabold text-rose-500 block mb-1 uppercase tracking-wider">4. Fecha de Entrega Estimada:</label>
+                <label class="text-[11px] font-bold text-rose-500 block mb-1">4. Fecha de Entrega Estimada:</label>
                 <input type="date" id="inputFecha" class="w-full px-3 py-2.5 bg-rose-50/50 rounded-xl text-xs font-bold text-rose-600 border border-rose-200 outline-none">
             </div>
 
-            <!-- Botón Guardar -->
-            <button onclick="guardarTrabajo()" class="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs py-3.5 rounded-2xl shadow-lg active:scale-98 transition-all flex items-center justify-center gap-2">
-                <i class="fa-solid fa-check text-xs"></i>
-                <span>Guardar Trabajo en la Agenda</span>
-            </button>
+            <button onclick="guardarTrabajo()" class="w-full bg-slate-900 text-white font-bold text-xs py-3.5 rounded-xl shadow-lg">✓ Guardar Trabajo en la Agenda</button>
         </div>
     </div>
 
     <script>
-        let trabajos = JSON.parse(localStorage.getItem('agenda_modista_v10')) || [];
+        let trabajos = JSON.parse(localStorage.getItem('agenda_modista_v11')) || [];
         let notificadosList = JSON.parse(localStorage.getItem('agenda_notificados_5dias')) || [];
         let rec = null;
         let filtroBarrioActual = 'TODOS';
@@ -140,49 +130,33 @@
         fDefecto.setDate(fDefecto.getDate() + 5);
         document.getElementById('inputFecha').value = fDefecto.toISOString().split('T')[0];
 
-        // REGISTRO DE SERVICE WORKER PARA NOTIFICACIONES
         if ('serviceWorker' in navigator && 'Notification' in window) {
             navigator.serviceWorker.register('sw.js')
-                .then(reg => {
-                    swRegistration = reg;
-                    comprobarNotificaciones5Dias();
-                })
-                .catch(err => console.log('Service Worker no disponible:', err));
+                .then(reg => { swRegistration = reg; comprobarNotificaciones5Dias(); })
+                .catch(err => console.log('SW Error:', err));
         }
 
         function solicitarPermisoNotificaciones() {
-            if (!('Notification' in window)) {
-                alert('Tu navegador no soporta notificaciones.');
-                return;
-            }
-            Notification.requestPermission().then(permission => {
-                if (permission === 'granted') {
-                    alert('¡Notificaciones activadas con éxito!');
-                    comprobarNotificaciones5Dias();
-                } else {
-                    alert('No se pudieron activar las notificaciones.');
-                }
+            if (!('Notification' in window)) { alert('Tu navegador no soporta notificaciones.'); return; }
+            Notification.requestPermission().then(p => {
+                if (p === 'granted') { alert('¡Notificaciones activadas!'); comprobarNotificaciones5Dias(); }
             });
         }
 
         function comprobarNotificaciones5Dias() {
             if (Notification.permission !== 'granted' || !swRegistration) return;
-
             trabajos.forEach(t => {
                 if (t.completado || !t.fechaEntrega) return;
-
                 const fEntrega = new Date(t.fechaEntrega + 'T00:00:00');
                 const fHoy = new Date(fechaHoyISO + 'T00:00:00');
                 const difDias = Math.ceil((fEntrega - fHoy) / (1000 * 60 * 60 * 24));
 
                 const claveNotif = `${t.id}_5dias_${t.fechaEntrega}`;
                 if (difDias === 5 && !notificadosList.includes(claveNotif)) {
-                    const mensaje = `Recordá que en 5 días tenés que entregar el trabajo de ${t.cliente}.`;
-
                     if (navigator.serviceWorker.controller) {
                         navigator.serviceWorker.controller.postMessage({
                             type: 'NOTIFICAR_ENTREGA',
-                            mensaje: mensaje
+                            mensaje: `Recordá que en 5 días tenés que entregar el trabajo de ${t.cliente}.`
                         });
                         notificadosList.push(claveNotif);
                         localStorage.setItem('agenda_notificados_5dias', JSON.stringify(notificadosList));
@@ -193,10 +167,9 @@
 
         function dictarEnCampo(idCampo, btn) {
             if (!('webkitSpeechRecognition' in window || 'SpeechRecognition' in window)) {
-                alert('El dictado por voz funciona en Google Chrome o Samsung Internet.');
+                alert('Usá Google Chrome o Samsung Internet para el dictado por voz.');
                 return;
             }
-
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
             rec = new SpeechRecognition();
             rec.lang = 'es-AR';
@@ -204,13 +177,11 @@
 
             rec.onstart = () => { btn.classList.add('pulse-mic'); };
             rec.onend = () => { btn.classList.remove('pulse-mic'); };
-
             rec.onresult = (e) => {
                 const texto = e.results[0][0].transcript;
                 const campo = document.getElementById(idCampo);
                 campo.value = campo.value ? `${campo.value}. ${texto}` : texto;
             };
-
             rec.start();
         }
 
@@ -222,8 +193,9 @@
             return str.split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase()).join(' ');
         }
 
+        // FORMATO ESTRICTO EN ÍTEMS INDEPENDIENTES (RENG LÓN POR RENG LÓN)
         function formatearEnItems(texto) {
-            if (!texto) return '';
+            if (!texto) return [];
             let preparado = texto.replace(/(cambiar|hacer|alargar|achicar|arreglar|realizar|poner|agregar)/gi, " | $1");
             const partes = preparado.split(/(?:\||,|\sy\s|\se\s|\.|\n)/i);
 
@@ -232,7 +204,7 @@
                 .filter(p => p.length > 2)
                 .map(p => `• ${p.charAt(0).toUpperCase() + p.slice(1)}`);
 
-            return items.length > 0 ? items.join('\n') : `• ${texto}`;
+            return items.length > 0 ? items : [`• ${texto}`];
         }
 
         function guardarTrabajo() {
@@ -241,16 +213,13 @@
             const rawDetalle = document.getElementById('txtDictado').value;
             const fechaEntrega = document.getElementById('inputFecha').value;
 
-            if (!rawDetalle) {
-                alert('Por favor anotá o dictá las prendas y arreglos a realizar.');
-                return;
-            }
+            if (!rawDetalle) { alert('Por favor anotá o dictá las prendas.'); return; }
 
             const nuevo = {
                 id: Date.now(),
                 cliente: capitalizar(rawCliente),
                 barrio: capitalizar(rawBarrio),
-                detalle: formatearEnItems(rawDetalle),
+                detalleItems: formatearEnItems(rawDetalle),
                 fechaRetiro: fechaHoyISO,
                 fechaEntrega,
                 completado: false
@@ -268,34 +237,30 @@
         }
 
         function obtenerCartelUrgencia(fechaEntregaStr) {
-            if (!fechaEntregaStr) return { texto: 'Sin Fecha', clase: 'bg-slate-100 text-slate-600', dias: 999 };
+            if (!fechaEntregaStr) return { texto: 'Sin Fecha', clase: 'badge-atiempo', dias: 999 };
 
             const fEntrega = new Date(fechaEntregaStr + 'T00:00:00');
             const fHoy = new Date(fechaHoyISO + 'T00:00:00');
             const difDias = Math.ceil((fEntrega - fHoy) / (1000 * 60 * 60 * 24));
 
-            if (difDias < 0) return { texto: '🚨 RETRASADO', clase: 'bg-rose-600 text-white animate-pulse', dias: difDias };
-            if (difDias <= 1) return { texto: '🔴 URGENTE', clase: 'bg-rose-500 text-white font-black', dias: difDias };
-            if (difDias <= 3) return { texto: `🟠 PRÓXIMO (${difDias} días)`, clase: 'bg-amber-500 text-white font-bold', dias: difDias };
-            if (difDias === 5) return { texto: `🔔 EN 5 DÍAS`, clase: 'bg-rose-100 text-rose-700 font-extrabold border border-rose-200', dias: difDias };
-            return { texto: `🟢 A TIEMPO (${difDias} días)`, clase: 'bg-emerald-500 text-white font-bold', dias: difDias };
+            if (difDias < 0) return { texto: '🚨 RETRASADO', clase: 'badge-urgente animate-pulse', dias: difDias };
+            if (difDias <= 1) return { texto: '🔴 URGENTE', clase: 'badge-urgente', dias: difDias };
+            if (difDias <= 3) return { texto: `🟠 PRÓXIMO (${difDias} d)`, clase: 'badge-proximo', dias: difDias };
+            if (difDias === 5) return { texto: `🔔 EN 5 DÍAS`, clase: 'badge-5dias', dias: difDias };
+            return { texto: `🟢 A TIEMPO (${difDias} d)`, clase: 'badge-atiempo', dias: difDias };
         }
 
         function renderFiltros(barriosDisponibles) {
             const cont = document.getElementById('contenedorFiltros');
             cont.innerHTML = '';
-
             const todosBarrios = ['TODOS', ...barriosDisponibles];
 
             todosBarrios.forEach(b => {
                 const btn = document.createElement('button');
                 const esActivo = filtroBarrioActual === b;
-                btn.className = `px-3.5 py-1.5 rounded-xl text-xs font-black whitespace-nowrap transition-all border ${esActivo ? 'bg-slate-900 text-white border-slate-900 shadow-sm' : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-100'}`;
+                btn.className = `px-3 py-1.5 rounded-xl text-xs font-extrabold whitespace-nowrap transition-all border ${esActivo ? 'bg-slate-900 text-white border-slate-900' : 'bg-white text-slate-600 border-slate-200'}`;
                 btn.innerText = b === 'TODOS' ? '📍 Todas las Zonas' : `📍 ${b}`;
-                btn.onclick = () => {
-                    filtroBarrioActual = b;
-                    renderTrabajos();
-                };
+                btn.onclick = () => { filtroBarrioActual = b; renderTrabajos(); };
                 cont.appendChild(btn);
             });
         }
@@ -307,24 +272,15 @@
             cont.innerHTML = '';
 
             if (trabajos.length === 0) {
-                cont.innerHTML = `
-                    <div class="text-center py-12 bg-white rounded-3xl border border-slate-200 p-6 shadow-sm">
-                        <i class="fa-solid fa-clipboard-check text-slate-300 text-4xl mb-3"></i>
-                        <p class="text-sm font-extrabold text-slate-700">¡No hay trabajos en la agenda!</p>
-                        <p class="text-xs text-slate-400 mt-1">Tocá el botón rosa de abajo para anotar el primero.</p>
-                    </div>
-                `;
+                cont.innerHTML = `<div class="text-center py-12 bg-white rounded-2xl border border-slate-200 p-6"><p class="text-sm font-bold text-slate-600">¡Sin trabajos en la agenda!</p></div>`;
                 renderFiltros([]);
                 return;
             }
 
             const barriosSet = new Set(trabajos.map(t => t.barrio || 'Sin Zona / Taller'));
-            const barriosArray = Array.from(barriosSet);
-            renderFiltros(barriosArray);
+            renderFiltros(Array.from(barriosSet));
 
-            const listaFiltrada = filtroBarrioActual === 'TODOS' 
-                ? trabajos 
-                : trabajos.filter(t => (t.barrio || 'Sin Zona / Taller') === filtroBarrioActual);
+            const listaFiltrada = filtroBarrioActual === 'TODOS' ? trabajos : trabajos.filter(t => (t.barrio || 'Sin Zona / Taller') === filtroBarrioActual);
 
             const grupos = {};
             listaFiltrada.forEach(t => {
@@ -335,18 +291,17 @@
 
             Object.keys(grupos).forEach(zona => {
                 const sec = document.createElement('section');
-                sec.className = "space-y-3";
-
+                sec.className = "space-y-2 mb-6";
                 sec.innerHTML = `
-                    <div class="flex items-center gap-2 px-1 border-b border-slate-200 pb-1.5">
-                        <i class="fa-solid fa-location-dot text-rose-500 text-sm"></i>
-                        <h3 class="font-black text-slate-800 text-sm uppercase tracking-wide">${zona}</h3>
-                        <span class="text-[10px] font-bold bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">${grupos[zona].filter(t => !t.completado).length} pendientes</span>
+                    <div class="flex items-center gap-1.5 border-b border-slate-200 pb-1">
+                        <span class="text-rose-500 font-bold">📍</span>
+                        <h3 class="font-extrabold text-slate-800 text-sm uppercase">${zona}</h3>
+                        <span class="text-[10px] font-bold bg-rose-100 text-rose-600 px-2 py-0.5 rounded-full">${grupos[zona].filter(t => !t.completado).length}</span>
                     </div>
                 `;
 
-                const contenedorTarjetas = document.createElement('div');
-                contenedorTarjetas.className = "space-y-3";
+                const contTarjetas = document.createElement('div');
+                contTarjetas.className = "space-y-3 pt-2";
 
                 const ordenados = grupos[zona].sort((a, b) => {
                     if (a.completado !== b.completado) return a.completado ? 1 : -1;
@@ -356,46 +311,47 @@
                 ordenados.forEach(t => {
                     const urgencia = obtenerCartelUrgencia(t.fechaEntrega);
                     const div = document.createElement('div');
-                    div.className = `bg-white p-4 sm:p-5 rounded-3xl border ${t.completado ? 'opacity-50 border-slate-200 bg-slate-50' : 'border-slate-200 shadow-sm'} space-y-3 transition-all`;
+                    div.className = `card ${t.completado ? 'opacity-50 bg-slate-50' : ''}`;
                     
+                    // Render de ítems en renglones separados
+                    let itemsHTML = "";
+                    if (t.detalleItems && Array.isArray(t.detalleItems)) {
+                        itemsHTML = t.detalleItems.map(it => `<span class="item-line">${it}</span>`).join('');
+                    } else {
+                        itemsHTML = `<span class="item-line">• ${t.detalle || ''}</span>`;
+                    }
+
                     div.innerHTML = `
-                        <div class="flex flex-wrap justify-between items-start gap-2 border-b border-slate-100 pb-2.5">
-                            <div>
-                                <h4 class="font-black text-slate-900 text-base leading-tight ${t.completado ? 'line-through text-slate-400' : ''}">${t.cliente}</h4>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                ${!t.completado ? `<span class="text-[10px] px-2.5 py-1 rounded-full whitespace-nowrap ${urgencia.clase}">${urgencia.texto}</span>` : ''}
-                                <button onclick="toggleEstado(${t.id})" class="text-[11px] px-3 py-1 rounded-xl font-extrabold shrink-0 ${t.completado ? 'bg-slate-200 text-slate-600' : 'bg-rose-50 text-rose-600 hover:bg-rose-100'}">
-                                    ${t.completado ? '✓ Listo' : 'Marcar Listo'}
+                        <div class="flex justify-between items-start border-b border-slate-100 pb-2 mb-2">
+                            <h4 class="font-extrabold text-slate-900 text-base ${t.completado ? 'line-through text-slate-400' : ''}">${t.cliente}</h4>
+                            <div class="flex items-center gap-1.5">
+                                ${!t.completado ? `<span class="badge ${urgencia.clase}">${urgencia.texto}</span>` : ''}
+                                <button onclick="toggleEstado(${t.id})" class="text-[11px] px-2.5 py-1 rounded-lg font-bold ${t.completado ? 'bg-slate-200 text-slate-600' : 'bg-rose-50 text-rose-600'}">
+                                    ${t.completado ? '✓' : 'Marcar Listo'}
                                 </button>
                             </div>
                         </div>
 
-                        <div class="text-xs sm:text-sm text-slate-800 font-bold bg-slate-50 p-3.5 rounded-2xl border border-slate-100 leading-relaxed whitespace-pre-line ${t.completado ? 'line-through text-slate-400' : ''}">${t.detalle}</div>
+                        <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 text-xs">
+                            ${itemsHTML}
+                        </div>
 
-                        <div class="flex flex-wrap justify-between items-center gap-2 pt-1 text-xs">
-                            <div class="text-[11px]">
-                                <span class="block text-slate-400 text-[10px] font-semibold">Retiro: ${formatearFechaLarga(t.fechaRetiro)}</span>
-                                <span class="font-black text-slate-800">Entrega: ${t.fechaEntrega ? formatearFechaLarga(t.fechaEntrega) : 'Sin fecha'}</span>
-                            </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <button onclick="borrarTrabajo(${t.id})" class="text-slate-300 hover:text-rose-500 p-1.5">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
-                            </div>
+                        <div class="flex justify-between items-center pt-2 text-[11px] font-bold text-slate-500">
+                            <span>Retiro: ${formatearFechaLarga(t.fechaRetiro)} | Entrega: <strong class="text-slate-800">${formatearFechaLarga(t.fechaEntrega)}</strong></span>
+                            <button onclick="borrarTrabajo(${t.id})" class="text-slate-300 hover:text-rose-500 text-sm">🗑️</button>
                         </div>
                     `;
-                    contenedorTarjetas.appendChild(div);
+                    contTarjetas.appendChild(div);
                 });
 
-                sec.appendChild(contenedorTarjetas);
+                sec.appendChild(contTarjetas);
                 cont.appendChild(sec);
             });
         }
 
         function toggleEstado(id) { trabajos = trabajos.map(t => t.id === id ? {...t, completado: !t.completado} : t); guardarLocal(); renderTrabajos(); }
         function borrarTrabajo(id) { trabajos = trabajos.filter(t => t.id !== id); guardarLocal(); renderTrabajos(); }
-        function guardarLocal() { localStorage.setItem('agenda_modista_v10', JSON.stringify(trabajos)); }
+        function guardarLocal() { localStorage.setItem('agenda_modista_v11', JSON.stringify(trabajos)); }
         function formatearFechaLarga(fechaStr) { if(!fechaStr) return ''; const partes = fechaStr.split('-'); return `${partes[2]}/${partes[1]}/${partes[0]}`; }
 
         renderTrabajos();
